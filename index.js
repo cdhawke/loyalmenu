@@ -54,9 +54,6 @@ var formatResponse = function (body) {
       'Content-Type': 'application/json',
     },
     isBase64Encoded: false,
-    multiValueHeaders: {
-      'X-Custom-Header': ['My value', 'My other value'],
-    },
     body: body,
   };
   return response;
