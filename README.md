@@ -1,32 +1,17 @@
-# pdf2text
+# loyalmenu
 
-Typescript template for creating and publishing with rollup, typescript, jest, eslint, prettier, and husky
+Node script to parse the Loyal menu pdf and post it to a slack channel
 
-## Building
-
-```sh
-yarn build
-```
-
-Or, to minify and remove source maps:
+## Usage
 
 ```sh
-yarn build-production
+npm i
 ```
 
-## Testing
+### Building and publishing
+
+Make sure you're logged in to aws via sso with `aws sso login` under the correct account / profile.
 
 ```sh
-yarn test
+npm run build && npm run package && npm run publish
 ```
-
-Note: If publishing for a web app, you may need the `jsdom` `testEnvironment` in the `jest.config.js`
-See https://jestjs.io/docs/configuration#testenvironment-string
-
-## Publishing
-
-```sh
-yarn publish
-```
-
-This should build the package with rollup, use the specified version, and publish the results.
