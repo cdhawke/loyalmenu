@@ -2,18 +2,21 @@ const axios = require('axios');
 const pdfjs = require('pdfjs-dist/legacy/build/pdf.js');
 
 const run = async () => {
-  const url =
-    'https://www.loyalcafe.fr/wp-content/uploads/2016/07/MENU-SUR-PLACE.pdf';
+  const url = 'https://www.loyalcafe.fr/menu.pdf';
   const loadingTask = pdfjs.getDocument(url);
 
   const pdf = await loadingTask.promise;
+
+  const metadata = await pdf.getMetadata();
+  console.log(metadata.metadata);
+  console.log(metadata.info);
 
   const page = await pdf.getPage(1);
   const content = await page.getTextContent();
   const xcoord = content.items.find(
     (item) =>
       item.str.startsWith('E N T R É E S') ||
-      item.str.startsWith('E N T R É E S') ||
+      item.str.startsWith('D E S S E R T S') ||
       item.str.startsWith('P L A T S')
   )?.transform[4];
 
@@ -26,13 +29,20 @@ const run = async () => {
       return item2.transform[5] - item1.transform[5];
     })
     .map((item) => {
+      if (
+        item.str.startsWith('D E S S E R T S') ||
+        item.str.startsWith('P L A T S')
+      ) {
+        return `\n${item.str}`;
+      }
       return item.str;
     })
     .join('\n');
 };
 
 // Handler
-exports.handler = async function () {
+// exports.handler = async function () {
+const main = async () => {
   const text = await run();
 
   // Post to slack
@@ -46,6 +56,8 @@ exports.handler = async function () {
     return formatError(error);
   }
 };
+
+main();
 
 var formatResponse = function (body) {
   var response = {
