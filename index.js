@@ -2,7 +2,8 @@ const axios = require('axios');
 const pdfjs = require('pdfjs-dist/legacy/build/pdf.js');
 
 const run = async () => {
-  const url = 'https://www.loyalcafe.fr/menu.pdf';
+  const url =
+    'https://www.loyalcafe.fr/wp-content/uploads/2016/07/MENU-SUR-PLACE.pdf';
   const loadingTask = pdfjs.getDocument(url);
 
   const pdf = await loadingTask.promise;
@@ -41,8 +42,7 @@ const run = async () => {
 };
 
 // Handler
-// exports.handler = async function () {
-const main = async () => {
+exports.handler = async function () {
   const text = await run();
 
   // Post to slack
@@ -56,8 +56,6 @@ const main = async () => {
     return formatError(error);
   }
 };
-
-main();
 
 var formatResponse = function (body) {
   var response = {
