@@ -7,7 +7,8 @@
     "build": "rollup -c",
     "package": "rm -rf dist && npm run build && cp package.json dist && cd dist && npm install --production && zip -r artifact.zip ./*",
     "publish": "cd dist && aws lambda update-function-code --function-name loyalmenu --zip-file fileb://artifact.zip --region eu-west-3",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node dev.js"
   },
   "author": "Christopher Hawke",
   "license": "MIT",
