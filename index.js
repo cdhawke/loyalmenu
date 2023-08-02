@@ -1,7 +1,14 @@
 const axios = require('axios');
 const pdfjs = require('pdfjs-dist/legacy/build/pdf.js');
 
-const run = async () => {
+const transformTitle = (s) => {
+  if (s.startsWith('E N T R É E S')) return '\n**ENTRÉES**';
+  if (s.startsWith('P L A T S')) return '\n**PLATS**';
+  if (s.startsWith('D E S S E R T S')) return '\n**DESSERTS**';
+  return s;
+}
+
+const extractText = async () => {
   const url =
     'https://www.loyalcafe.fr/wp-content/uploads/2016/07/MENU-SUR-PLACE.pdf';
   const loadingTask = pdfjs.getDocument(url);
@@ -10,40 +17,28 @@ const run = async () => {
 
   const metadata = await pdf.getMetadata();
   console.log(metadata.metadata);
-  console.log(metadata.info);
 
   const page = await pdf.getPage(1);
   const content = await page.getTextContent();
-  const xcoord = content.items.find(
-    (item) =>
-      item.str.startsWith('E N T R É E S') ||
-      item.str.startsWith('D E S S E R T S') ||
-      item.str.startsWith('P L A T S')
-  )?.transform[4];
+  const items = content.items.filter(i =>
+    i.str.trim() != ''
+    && !i.str.includes("TOUS NOS POISSONS & VIANDE")
+    && !i.str.includes("M E N U")
+    && i.transform[4] < 100 // x < 100
+  )
+  .sort((item1, item2) => {
+    return item2.transform[5] - item1.transform[5]; // sort by y
+  })
+  .map(i => i.str)
+  .map(s => transformTitle(s));
 
-  return content.items
-    .filter(
-      (item) =>
-        item.hasEOL && item.width > 0 && item.transform[4] <= xcoord + 50
-    )
-    .sort((item1, item2) => {
-      return item2.transform[5] - item1.transform[5];
-    })
-    .map((item) => {
-      if (
-        item.str.startsWith('D E S S E R T S') ||
-        item.str.startsWith('P L A T S')
-      ) {
-        return `\n${item.str}`;
-      }
-      return item.str;
-    })
-    .join('\n');
+  return items.join('\n');
 };
+exports.extractText = extractText;
 
 // Handler
 exports.handler = async function () {
-  const text = await run();
+  const text = await extractText();
 
   // Post to slack
   await axios.post(process.env.SLACK_WEBHOOK_URL, {
