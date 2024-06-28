@@ -1,3 +1,6 @@
+import typescript from '@rollup/plugin-typescript';
+import commonjs from '@rollup/plugin-commonjs';
+import nodeResolve from '@rollup/plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
 import * as packageJson from './package.json';
 
@@ -10,19 +13,20 @@ const banner = `
    */
 `;
 
-export default [
-  {
-    input: 'index.js',
-    output: [
-      {
-        file: `dist/${packageJson.main}`,
-        format: 'cjs',
-        sourcemap: false,
-        name: 'loyalmenu',
-        banner,
-        exports: 'named',
-      },
-    ],
-    plugins: [terser()],
+export default {
+  input: 'src/index.ts',
+  output: {
+    file: `dist/${packageJson.main}`,
+    format: 'cjs',
+    banner,
+    sourcemap: true,
   },
-];
+  plugins: [
+    nodeResolve(),
+    commonjs(),
+    typescript({
+      tsconfig: './tsconfig.json',
+    }),
+    terser(),
+  ],
+};

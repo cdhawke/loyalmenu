@@ -1,4 +1,4 @@
-const { extractText } = require('./index.js');
+const { extractText } = require('./dist/index.js');
 
 (async () => {
   console.log(await extractText());
