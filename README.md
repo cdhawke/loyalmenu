@@ -20,6 +20,14 @@ npm run dev
 
 Make sure you're logged in to aws via sso with `aws sso login` under the correct account / profile.
 
+e.g.
+
 ```sh
-npm run build && npm run package && npm run publish
+aws sso login --profile search
+```
+
+You may also need to publish using this profile explicitly if the default is not set to the correct one.
+
+```sh
+npm run package && npm run publish -- --profile search
 ```
