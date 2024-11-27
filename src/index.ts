@@ -29,8 +29,7 @@ const combineCharacters = (items: any[]) => {
 };
 
 const extractText = async () => {
-  const url =
-    'https://www.loyalcafe.fr/wp-content/uploads/2016/07/MENU-SUR-PLACE.pdf';
+  const url = 'https://www.loyalcafe.fr/menu/';
   const loadingTask = getDocument(url);
 
   const pdf = await loadingTask.promise;
