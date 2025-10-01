@@ -30,7 +30,7 @@ const combineCharacters = (items: any[]) => {
 
 const extractText = async () => {
   const url =
-    'https://www.loyalcafe.fr/wp-content/uploads/2016/07/MENU-SUR-PLACE.pdf';
+    'https://www.loyalcafe.fr/wp-content/uploads/2016/07/MENU-DU-JOUR.pdf';
   const loadingTask = getDocument(url);
 
   const pdf = await loadingTask.promise;
@@ -39,20 +39,13 @@ const extractText = async () => {
   const content = await page.getTextContent();
   const items = content.items as TextItem[];
 
-  let maxWidth = 0;
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i];
-    if (item.transform[4] > maxWidth) {
-      maxWidth = item.transform[4];
-    }
-  }
-
   const filtered = (content.items as TextItem[])
     .filter((i) => {
       return (
         i.str.trim() !== '' && // Filter out empty strings
-        i.transform[4] < maxWidth / 2 && // Filter out the right side of the page
-        i.transform[5] < 500 // Filter out the 'MENU' header
+        i.transform[5] > 130 && // Filter out the drinks footer
+        i.transform[5] < 670 && // Filter out the date header
+        !i.str.trim().match(/[0-9.]+€/g) // Filter out prices
       );
     })
     .sort((item1: TextItem, item2: TextItem) => {
@@ -62,8 +55,7 @@ const extractText = async () => {
   const combinedText = combineCharacters(filtered);
   const lines = combinedText
     .split('\n')
-    .map((line: string) => transformTitle(line.trim()))
-    .filter((line: string) => line !== '' && !line.includes('TOUSNOSPOISSONS'));
+    .map((line: string) => transformTitle(line.trim()));
 
   return lines.join('\n').trim();
 };
