@@ -39,11 +39,18 @@ const extractText = async () => {
   const content = await page.getTextContent();
   const items = content.items as TextItem[];
 
-  const filtered = (content.items as TextItem[])
+  let drinksY = 150; // Y placement when I tried
+  for (const item of items) {
+    if (item.str.match(/BOISSONS/)) {
+      drinksY = item.transform[5]; // Try to find actual position
+    }
+  }
+
+  const filtered = items
     .filter((i) => {
       return (
         i.str.trim() !== '' && // Filter out empty strings
-        i.transform[5] > 130 && // Filter out the drinks footer
+        i.transform[5] > drinksY && // Filter out the drinks footer
         i.transform[5] < 670 && // Filter out the date header
         !i.str.trim().match(/[0-9.]+€/g) // Filter out prices
       );
